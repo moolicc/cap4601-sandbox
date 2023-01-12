@@ -1,16 +1,10 @@
-# Define required macros here
-SHELL = /bin/sh
+CXX = g++
+CXXFLAGS = -g -std=c++11 -Wall
 
-OBJS =  main.o
-CFLAG = -Wall -g
-CC = gcc
-LIBS = -lm
+main: main.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-hello:${OBJ}
-   ${CC} ${CFLAGS} -o $@ ${OBJS} ${LIBS}
 
 clean:
-   -rm -f *.o core *.core
-
-.cpp.o:
-   ${CC} ${CFLAGS} -c $<
+	rm -rf *.dSYM
+	$(RM) *.o *.gc* main
