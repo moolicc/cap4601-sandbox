@@ -1,21 +1,6 @@
 #include "board.hpp"
 #include <iostream>
 
-// Board::Board(): size(0), playingField(10, std::vector<Cell>(10)){}
-
-// Board::Board(int size): size(size), playingField(size, std::vector<Cell>(size)){
-
-//   for(int i = 0; i < size; i++){
-//     for(int j = 0; j < size; j++){
-//       // printf("Accessing playingField at row: %d\n", i);
-//       playingField.at(i).push_back(Cell());
-//       playingField.at(i).at(j).setPlayerToken("X");
-//       std::string str = playingField.at(i).at(j).getStatus();
-//       std::cout << "Cell status: " << str << '|' << std::endl;
-//     }
-//   }
-// }
-
 Board::Board(int size): size(size) {
   playingField = new Cell*[size];
   for (int i = 0; i < size; ++i) 
