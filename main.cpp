@@ -1,21 +1,87 @@
 
-#include <iostream>
 #include "board.hpp"
-int main(int argc, char *argv[])
-{
-    std::cout << "Testing board class..." << std::endl;
-    Board board(7);
-    std::cout << board.place(1, Players::Player1) << std::endl;
-    std::cout << board.place(1, Players::Player1) << std::endl;
-    std::cout << board.place(1, Players::Player1) << std::endl;
-    std::cout << board.place(1, Players::Player1) << std::endl;
-    std::cout << board.place(1, Players::Player1) << std::endl;
-    std::cout << board.place(1, Players::Player1) << std::endl;
-    std::cout << board.place(1, Players::Player1) << std::endl;
-    std::cout << board.place(1, Players::Player1) << std::endl;
+#include <iostream>
+int main(int argc, char* argv[]) {
 
-    std::cout << board.place(3, Players::Player2) << std::endl;
-    std::cout << board.place(4, Players::Player1) << std::endl;
-    board.draw();
-    return 0;
+  // N = board size M = consecutivity H = human goes first? 1: 0
+
+  std::cout << "Testing board class..." << std::endl;
+  int rows = 7;
+  int winLength = 4;
+  Board board(rows, winLength);
+
+  // down and to the left win
+  // board.place(3, Players::Player2);
+  // board.place(3, Players::Player2);
+  // board.place(3, Players::Player1);
+  // board.place(3, Players::Player1);
+
+  // board.place(2, Players::Player2);
+  // board.place(2, Players::Player1);
+  // board.place(2, Players::Player1);
+
+  // board.place(1, Players::Player2);
+  // board.place(1, Players::Player1);
+
+  // board.place(0, Players::Player1);
+
+  board.place(0, Players::Player2);
+  board.place(0, Players::Player2);
+  board.place(0, Players::Player1);
+  board.place(0, Players::Player1);   // top
+
+  board.place(1, Players::Player2);
+  board.place(1, Players::Player1);
+  board.place(1, Players::Player1);   // top
+
+  board.place(2, Players::Player2);
+  board.place(2, Players::Player1);   // top
+
+  board.place(3, Players::Player1);   // top
+  std::cout << board.checkForWin(0) << std::endl;
+
+  // up and to the right test
+  // board.place(3, Players::Player1);   // top
+
+  // board.place(4, Players::Player2);
+  // board.place(4, Players::Player1);   // top
+
+  // board.place(5, Players::Player2);
+  // board.place(5, Players::Player2);
+  // board.place(5, Players::Player1);   // top
+
+  // board.place(6, Players::Player2);
+  // board.place(6, Players::Player2);
+  // board.place(6, Players::Player1);
+  // board.place(6, Players::Player1);   // top
+  // board.place(2, Players::Player2);
+  // board.place(3, Players::Player2);
+  // board.place(4, Players::Player2);
+  // board.place(5, Players::Player2);
+  // std::cout << board.checkForWin(5) << std::endl;
+
+  board.draw();
+  return 0;
 }
+
+/*
+
+
+  0   1   2   3   4   5   6
++---+---+---+---+---+---+---+
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 |
++---+---+---+---+---+---+---+
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 |
++---+---+---+---+---+---+---+
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 |
++---+---+---+---+---+---+---+
+| 1 | 0 | 0 | 0 | 0 | 0 | 0 |
++---+---+---+---+---+---+---+
+| 1 | 1 | 0 | 0 | 0 | 0 | 0 |
++---+---+---+---+---+---+---+
+| 2 | 1 | 1 | 0 | 0 | 0 | 0 |
++---+---+---+---+---+---+---+
+| 2 | 2 | 2 | 1 | 0 | 0 | 0 |
++---+---+---+---+---+---+---+
+
+*/

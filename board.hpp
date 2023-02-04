@@ -3,36 +3,29 @@
 
 #include <string>
 
-enum Players
-{
-  None = 0,
-  Player1 = 1,
-  Player2 = 2
-};
+enum Players { None = 0, Player1 = 1, Player2 = 2 };
 
-class Board
-{
+class Board {
 private:
-  int columnCount;
-  int rowCount;
-  int *columns;
+  int size;
+  int winLength;
+  int* columns;
 
-  Players getMove(int col, int row) const;
   int getColumnValue(int col) const;
 
   std::string repeat(const std::string str, int num) const;
 
 public:
-  Board(int size);
+  Players getMove(int col, int row) const;
+  Board(int size, int winLength);
   // explicit Board() { Board(3); }
   // explicit Board(const Board &board);
   ~Board();
 
-  int getColumnCount() const { return columnCount; }
-  int getRowCount() const { return rowCount; }
+  int getSize() const { return size; }
 
   bool place(int col, Players player);
-  Players checkForWin() const;
+  Players checkForWin(int col) const;
 
   void draw() const;
 };
