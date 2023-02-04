@@ -1,11 +1,10 @@
 CXX = g++
 CXXFLAGS = -g -std=c++17 -Wall
-OBJECTS = main.o cell.o board.o
-FILES = main cell board
+OBJECTS = main.o board.o
+FILES = main board
 
 main: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -rf *.dSYM
-	$(RM) *.o *.gc* $(FILES)
+	rm -rf $(FILES) *.o
