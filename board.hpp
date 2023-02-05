@@ -7,11 +7,17 @@ enum Players { None = 0, Player1 = 1, Player2 = 2 };
 
 class Board {
 private:
+  const short MOVE_MASK = 0b0000111111111111;
+  const short LENGTH_MASK = 0b1111000000000000;
+  const int MOVE_BITS = 4;
+  const int LENGTH_BITS = 4;
+  const int MAX_LENGTH = 15;
+
   int size;
   int winLength;
-  int* columns;
+  short* columns;
 
-  int getColumnValue(int col) const;
+  short getColumnValue(int col) const;
 
   std::string repeat(const std::string str, int num) const;
 

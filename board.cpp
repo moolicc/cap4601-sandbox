@@ -3,7 +3,7 @@
 #include <iostream>
 
 Board::Board(int size, int winLength) : size(size), winLength(winLength) {
-  this->columns = new int[size];
+  this->columns = new short[size];
 
   for (int i = 0; i < size; i++) {
     columns[i] = Players::None;
@@ -24,66 +24,61 @@ Board::Board(int size, int winLength) : size(size), winLength(winLength) {
 Board::~Board() { delete[] columns; }
 
 Players Board::getMove(int col, int row) const {
-  int colValue = columns[col];
+  short colValue = columns[col];
 
   // Check for no move.
-  Players checkPlayer = Players::None;
-  int rowOffset = (row * 3) + checkPlayer;
-  if ((colValue & (1 << rowOffset)) == (1 << rowOffset)) {
-    return checkPlayer;
+  int colLength = colValue >> MOVE_BITS;
+  if (row >= colLength) {
+    return Players::None;
   }
 
-  // Check for a player1 move.
-  checkPlayer = Players::Player1;
-  rowOffset = (row * 3) + checkPlayer;
-  if ((colValue & (1 << rowOffset)) == (1 << rowOffset)) {
-    return checkPlayer;
-  }
-
-  // Check for a player2 move.
-  checkPlayer = Players::Player2;
-  rowOffset = (row * 3) + checkPlayer;
-  if ((colValue & (1 << rowOffset)) == (1 << rowOffset)) {
-    return checkPlayer;
-  }
-
-  return Players::None;
+  short rowMask = 1 << row;
+  return (Players) (((col & rowMask) >> row) + 1);
 }
 
-int Board::getColumnValue(int col) const { return columns[col]; }
+short Board::getColumnValue(int col) const { return columns[col]; }
 
 bool Board::place(int col, Players player) {
   // Ensure the column is valid.
   if (col < 0 && col >= size) {
     return false;
   }
+  short colValue = columns[col];
 
-  // Find the first unused row.
-  int row = 0;
-
-  while (row < size && getMove(col, row) != Players::None) {
-    row++;
-  }
-
-  // Ensure the row is valid.
-  if (row >= size) {
+  // Ensure there is space on the column for another move.
+  int colLength = colValue >> MOVE_BITS;
+  if (colLength >= MAX_LENGTH) {
     return false;
   }
 
   // Add our new move to the column.
-  columns[col] = columns[col] | (1 << ((row * 3) + player));
+  // Using the MOVE_MASK will remove the column length data.
+  // We replace this data below with the new length.
+  // This is intentional, as below performing a simple OR on the column length
+  // bits would cause inaccurate lengths to be held.
+
+  // For example, if the current length is 1 (0b0001...) and we add a new move
+  // then naturally the length should go to 2 (0b0010...). However, using the OR
+  // below WITHOUT a mask here to clear the old length would result in a length
+  // of 3 (0b0001 | 0b0010 = 0b0011).
+
+  colValue = MOVE_MASK & (col | (player << colLength));
+
+  // Update the column's length.
+  colLength++;
+  colValue |= colLength << MOVE_BITS;
+
+  // Add our new move to the column.
+  columns[col] = colValue;
 
   return true;
 }
 
 Players Board::checkForWin(int refCol) const {
-  // Find the first empty row along the column.
-  int refRow = -1;
   int count = 0;
 
-  while (getMove(refCol, refRow + 1) != Players::None && refRow < size) {
-    refRow++;
-  }
+  // Get the most recently placed row.
+  int refRow = (columns[refCol] >> MOVE_BITS) - 1;
 
   std::cout << "refCol: " << refCol << " refRow: " << refRow << std::endl;
   Players player = getMove(refCol, refRow);
