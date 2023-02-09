@@ -34,7 +34,7 @@ Players Board::getMove(int col, int row) const {
 
   short rowMask = 1 << row;
 
-  return (Players) (!(col & rowMask) >> row);
+  return (Players) ((colValue & rowMask) >> row);
 }
 
 short Board::getColumnValue(int col) const { return columns[col]; }
@@ -63,17 +63,12 @@ bool Board::place(int col, Players player) {
   // below WITHOUT a mask here to clear the old length would result in a length
   // of 3 (0b0001 | 0b0010 = 0b0011).
 
-  std::cout << "Placing in col: " << col << std::endl;
-  std::cout << "  old value: " << colValue << " old len " << colLength
-            << std::endl;
   colValue = MOVE_MASK & (colValue | (player << colLength));
 
   // Update the column's length.
   colLength++;
 
   colValue |= colLength << MOVE_BITS;
-  std::cout << "  new value: " << colValue << " new len " << colLength
-            << std::endl;
 
   // Add our new move to the column.
   columns[col] = colValue;
@@ -87,8 +82,14 @@ Players Board::checkForWin(int refCol) const {
   // Get the most recently placed row.
   int refRow = (columns[refCol] >> MOVE_BITS) - 1;
 
-  std::cout << "refCol: " << refCol << " refRow: " << refRow << std::endl;
+  if (refRow < 0) {
+    return Players::None;
+  }
+
+  std::cout << "Checking at: " << refCol << "  " << refRow << std::endl;
   Players player = getMove(refCol, refRow);
+
+  std::cout << "Checking player: " << player << std::endl;
 
   // check horizontal right
   for (int col = refCol; col < refCol + winLength && col < size; col++) {
@@ -97,8 +98,9 @@ Players Board::checkForWin(int refCol) const {
     } else {
       break;
     }
-    if (count == winLength)
+    if (count == winLength) {
       return player;
+    }
   }
   count = 0;
 
@@ -109,8 +111,9 @@ Players Board::checkForWin(int refCol) const {
     } else {
       break;
     }
-    if (count == winLength)
+    if (count == winLength) {
       return player;
+    }
   }
   count = 0;
 
@@ -121,36 +124,43 @@ Players Board::checkForWin(int refCol) const {
     } else {
       break;
     }
-    if (count == winLength)
+    if (count == winLength) {
       return player;
+    }
   }
   count = 0;
 
   // diagonal down to the left
   // row decreases , col decreases
   for (int col = refCol, row = refRow;
-       col > refCol - winLength && row > refRow - winLength; col--, row--) {
+       col > refCol - winLength && row > refRow - winLength && col >= 0 &&
+       row >= 0;
+       col--, row--) {
     if (getMove(col, row) == player) {
       count++;
     } else {
       break;
     }
-    if (count == winLength)
+    if (count == winLength) {
       return player;
+    }
   }
   count = 0;
 
   // dialgonal down to the right
   // row ++ , col++
   for (int col = refCol, row = refRow;
-       col <= refCol + winLength && row > refRow - winLength; col++, row--) {
+       col <= refCol + winLength && row > refRow - winLength && col < size &&
+       row >= 0;
+       col++, row--) {
     if (getMove(col, row) == player) {
       count++;
     } else {
       break;
     }
-    if (count == winLength)
+    if (count == winLength) {
       return player;
+    }
   }
   count = 0;
 
@@ -163,8 +173,9 @@ Players Board::checkForWin(int refCol) const {
     } else {
       break;
     }
-    if (count == winLength)
+    if (count == winLength) {
       return player;
+    }
   }
   count = 0;
 
@@ -177,8 +188,9 @@ Players Board::checkForWin(int refCol) const {
     } else {
       break;
     }
-    if (count == winLength)
+    if (count == winLength) {
       return player;
+    }
   }
   count = 0;
 
