@@ -64,11 +64,17 @@ bool Board::place(int col, Players player) {
   // below WITHOUT a mask here to clear the old length would result in a length
   // of 3 (0b0001 | 0b0010 = 0b0011).
 
+  std::cout << "Placing in col: " << col << std::endl;
+  std::cout << "  old value: " << colValue << " old len " << colLength
+            << std::endl;
   colValue = MOVE_MASK & (colValue | (player << colLength));
 
   // Update the column's length.
   colLength++;
+
   colValue |= colLength << MOVE_BITS;
+  std::cout << "  new value: " << colValue << " new len " << colLength
+            << std::endl;
 
   // Add our new move to the column.
   columns[col] = colValue;

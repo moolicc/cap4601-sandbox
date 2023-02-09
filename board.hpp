@@ -9,7 +9,7 @@ class Board {
 private:
   const short MOVE_MASK = 0b0000111111111111;
   const short LENGTH_MASK = 0b1111000000000000;
-  const int MOVE_BITS = 4;
+  const int MOVE_BITS = 12;
   const int LENGTH_BITS = 4;
   const int MAX_LENGTH = 15;
 
