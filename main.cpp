@@ -18,10 +18,12 @@ int main(int argc, char* argv[]) {
   printf("board size: %d, winLength: %d\n", cols, winLength);
 
   // down and to the left win
-  board.place(3, Players::Player1);
-  board.place(0, Players::Player2);
   board.draw();
+  board.place(0, Players::Player1);
+  board.place(0, Players::Player2);
+  // board.place(0, Players::Player2);
   std::cout << (board.checkForWin(0) == Players::Player1) << std::endl;
+  board.draw();
   // board.place(3, Players::Player1);
   // board.place(3, Players::Player1);
 
