@@ -28,6 +28,8 @@ Players Board::getMove(int col, int row) const {
 
   // Check for no move.
   int colLength = colValue >> MOVE_BITS;
+  std::cout << "row: " << row << " colLength: " << colLength << std::endl;
+
   if (row >= colLength) {
     return Players::None;
   }
@@ -48,6 +50,7 @@ bool Board::place(int col, Players player) {
 
   // Ensure there is space on the column for another move.
   int colLength = colValue >> MOVE_BITS;
+  // std::cout << "colLength: " << colLength << std::endl;
   if (colLength >= MAX_LENGTH) {
     return false;
   }
@@ -80,7 +83,7 @@ Players Board::checkForWin(int refCol) const {
   int count = 0;
 
   // Get the most recently placed row.
-  int refRow = (columns[refCol] >> MOVE_BITS) - 1;
+  int refRow = (columns[refCol] >> MOVE_BITS);
 
   if (refRow < 0) {
     return Players::None;
@@ -230,10 +233,21 @@ void Board::draw() const {
     for (int j = 0; j < size; j++) {
       // only show the contents of the cell if a player occupies it with their
       // disk
-      if (getMove(j, i) != Players::None)
-        board += vBorder + ' ' + (char) (getMove(j, i) + 0x30) + ' ';
-      // otherwise show an empty cell
-      else
+      if (getMove(j, i) != Players::None) {
+        Players player = getMove(j, i);
+        char playerChar = '\0';
+        switch (player) {
+        case Players::Player1:
+          playerChar = 'X';
+          break;
+        case Players::Player2:
+          playerChar = 'O';
+          break;
+        default:
+          break;
+        }
+        board += vBorder + ' ' + playerChar + ' ';
+      } else   // otherwise show an empty cell
         board += vBorder + "   ";
     }
     board += vBorder + '\n';

@@ -75,7 +75,6 @@ int main(int argc, char* argv[]) {
 
   // while (true) {
   //   int move;
-  //   Players winner = Players::None;
   //   board.draw();
 
   //   std::cout << "Player 1 please enter your move: ";
@@ -83,9 +82,7 @@ int main(int argc, char* argv[]) {
   //   std::cout << std::endl;
   //   board.place(move, Players::Player1);
 
-  //   winner = board.checkForWin(move);
-  //   std::cout << winner << std::endl;
-  //   if (winner == Players::Player1) {
+  //   if (board.checkForWin(move) == Players::Player1) {
   //     std::cout << "The winner is: "
   //               << "Player 1" << std::endl;
   //     break;
@@ -98,9 +95,7 @@ int main(int argc, char* argv[]) {
   //   board.place(move, Players::Player2);
 
   //   // std::cout << (winner == Players::Player2) << std::endl;
-  //   winner = board.checkForWin(move);
-  //   std::cout << winner << std::endl;
-  //   if (winner == Players::Player2) {
+  //   if (board.checkForWin(move) == Players::Player1) {
   //     std::cout << "The winner is: "
   //               << "Player 2" << std::endl;
   //     break;
