@@ -24,66 +24,8 @@ int main(int argc, char* argv[]) {
   // std::cout << (board.checkForWin(0) == Players::Player2) << std::endl;
   board.place(1, Players::Player1);
   std::cout << (board.checkForWin(1) == Players::Player1) << std::endl;
-  // board.place(1, Players::Player2);
-  // std::cout << (board.checkForWin(1) == Players::Player2) << std::endl;
-  // board.place(2, Players::Player1);
-  // std::cout << (board.checkForWin(2) == Players::Player1) << std::endl;
-  // board.place(2, Players::Player2);
-  // std::cout << (board.checkForWin(2) == Players::Player2) << std::endl;
-  // board.place(3, Players::Player1);
-  // std::cout << (board.checkForWin(3) == Players::Player1) << std::endl;
-  // board.place(3, Players::Player2);
-  // std::cout << (board.checkForWin(3) == Players::Player1) << std::endl;
+
   board.draw();
-  // board.place(3, Players::Player1);
-  // board.place(0, Players::Player2);
-  // board.draw();
-  // board.place(3, Players::Player1);
-  // board.place(3, Players::Player1);
-
-  // board.place(2, Players::Player2);
-  // board.place(2, Players::Player1);
-  // board.place(2, Players::Player1);
-
-  // board.place(1, Players::Player2);
-  // board.place(1, Players::Player1);
-
-  // board.place(0, Players::Player1);
-
-  // board.place(0, Players::Player2);
-  // board.place(0, Players::Player2);
-  // board.place(0, Players::Player1);
-  // board.place(0, Players::Player1);   // top
-
-  // board.place(1, Players::Player2);
-  // board.place(1, Players::Player1);
-  // board.place(1, Players::Player1);   // top
-
-  // board.place(2, Players::Player2);
-  // board.place(2, Players::Player1);   // top
-
-  // board.place(3, Players::Player1);   // top
-  // std::cout << board.checkForWin(0) << std::endl;
-
-  // up and to the right test
-  // board.place(3, Players::Player1);   // top
-
-  // board.place(4, Players::Player2);
-  // board.place(4, Players::Player1);   // top
-
-  // board.place(5, Players::Player2);
-  // board.place(5, Players::Player2);
-  // board.place(5, Players::Player1);   // top
-
-  // board.place(6, Players::Player2);
-  // board.place(6, Players::Player2);
-  // board.place(6, Players::Player1);
-  // board.place(6, Players::Player1);   // top
-  // board.place(2, Players::Player2);
-  // board.place(3, Players::Player2);
-  // board.place(4, Players::Player2);
-  // board.place(5, Players::Player2);
-  // std::cout << board.checkForWin(5) << std::endl;
 
   // while (true) {
   //   int move;
