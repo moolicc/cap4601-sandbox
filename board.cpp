@@ -28,8 +28,6 @@ Players Board::getMove(int col, int row) const {
 
   // Check for no move.
   int colLength = colValue >> MOVE_BITS;
-  std::cout << "row: " << row << " colLength: " << colLength << std::endl;
-
   if (row >= colLength) {
     return Players::None;
   }
@@ -50,7 +48,6 @@ bool Board::place(int col, Players player) {
 
   // Ensure there is space on the column for another move.
   int colLength = colValue >> MOVE_BITS;
-  // std::cout << "colLength: " << colLength << std::endl;
   if (colLength >= MAX_LENGTH) {
     return false;
   }
@@ -83,7 +80,7 @@ Players Board::checkForWin(int refCol) const {
   int count = 0;
 
   // Get the most recently placed row.
-  int refRow = (columns[refCol] >> MOVE_BITS);
+  int refRow = (columns[refCol] >> MOVE_BITS) - 1;
 
   if (refRow < 0) {
     return Players::None;
