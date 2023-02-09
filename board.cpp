@@ -209,7 +209,13 @@ void Board::draw() const {
   for (int i = size - 1; i >= 0; i--) {
     board += hBorderStart + repeat(hBorder, size);
     for (int j = 0; j < size; j++) {
-      board += vBorder + ' ' + (char) (getMove(j, i) + 0x30) + ' ';
+      // only show the contents of the cell if a player occupies it with their
+      // disk
+      if (getMove(j, i) != Players::None)
+        board += vBorder + ' ' + (char) (getMove(j, i) + 0x30) + ' ';
+      // otherwise show an empty cell
+      else
+        board += vBorder + "   ";
     }
     board += vBorder + '\n';
   }
