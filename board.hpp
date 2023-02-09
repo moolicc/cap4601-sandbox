@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum Players { None = 0, Player1 = 2, Player2 = 1 };
+enum Players { None = -1, Player1 = 0, Player2 = 1 };
 
 class Board {
 private:

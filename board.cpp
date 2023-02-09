@@ -6,7 +6,7 @@ Board::Board(int size, int winLength) : size(size), winLength(winLength) {
   this->columns = new short[size];
 
   for (int i = 0; i < size; i++) {
-    columns[i] = Players::None;
+    columns[i] = 0;
   }
 }
 
@@ -33,7 +33,8 @@ Players Board::getMove(int col, int row) const {
   }
 
   short rowMask = 1 << row;
-  return (Players) (((col & rowMask) >> row) + 1);
+
+  return (Players) (!(col & rowMask) >> row);
 }
 
 short Board::getColumnValue(int col) const { return columns[col]; }
@@ -62,7 +63,7 @@ bool Board::place(int col, Players player) {
   // below WITHOUT a mask here to clear the old length would result in a length
   // of 3 (0b0001 | 0b0010 = 0b0011).
 
-  colValue = MOVE_MASK & (col | (player << colLength));
+  colValue = MOVE_MASK & (colValue | (player << colLength));
 
   // Update the column's length.
   colLength++;
