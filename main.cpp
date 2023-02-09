@@ -23,9 +23,26 @@ int main(int argc, char* argv[]) {
   board.place(3, Players::Player2);
   board.place(3, Players::Player2);
   board.place(3, Players::Player2);
+
+  board.place(0, Players::Player1);
+  board.place(0, Players::Player1);
+  board.place(0, Players::Player1);
+  board.place(0, Players::Player1);
   board.place(0, Players::Player1);
   board.draw();
-  std::cout << "winner: " << board.checkForWin(3) << std::endl;
+
+  Players winner = board.checkForWin(0);
+
+  std::cout << "winner: ";
+  if (winner == Players::Player1) {
+    std::cout << "Player 1";
+  } else if (winner == Players::Player2) {
+    std::cout << "Player 2";
+  } else {
+    std::cout << "Nobody";
+  }
+  std::cout << std::endl;
+
   // board.place(3, Players::Player1);
   // board.place(3, Players::Player1);
 

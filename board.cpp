@@ -86,10 +86,7 @@ Players Board::checkForWin(int refCol) const {
     return Players::None;
   }
 
-  std::cout << "Checking at: " << refCol << "  " << refRow << std::endl;
   Players player = getMove(refCol, refRow);
-
-  std::cout << "Checking player: " << player << std::endl;
 
   // check horizontal right
   for (int col = refCol; col < refCol + winLength && col < size; col++) {
