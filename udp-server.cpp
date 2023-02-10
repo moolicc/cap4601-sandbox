@@ -23,7 +23,7 @@ bool UdpServer::send(char outgoing) {
   char buffer[1] = {outgoing};
 
   sendto(sockfd, (const char*) buffer, strlen((const char*) buffer),
-         MSG_CONFIRM, (const struct sockaddr*) &clientAddr, len);
+         0, (const struct sockaddr*) &clientAddr, len);
 
   return true;
 }

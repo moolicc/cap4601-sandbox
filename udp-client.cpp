@@ -16,7 +16,7 @@ void UdpClient::start(unsigned short port, std::string ipAddress) {
 
 bool UdpClient::sendToServer() {
   const char* msg = "1";
-  sendto(sockfd, (const char*) msg, 1, MSG_CONFIRM,
+  sendto(sockfd, (const char*) msg, 1, 0,
          (const struct sockaddr*) &servaddr, sizeof(servaddr));
 
   return true;
