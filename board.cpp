@@ -153,7 +153,7 @@ Players Board::checkForWin(int refCol) const {
   }
   count = 0;
 
-  // dialgonal down to the right
+  // diagonal down to the right
   // row ++ , col++
   for (int col = refCol, row = refRow;
        col <= refCol + winLength && row > refRow - winLength && col < size &&
@@ -204,7 +204,7 @@ Players Board::checkForWin(int refCol) const {
 }
 
 /**
- * @brief A simple funciton to draw a board of the following layout based on the
+ * @brief A simple function to draw a board of the following layout based on the
 size of the playingField.
  *        This example assumes a board size of 4X4
  *
