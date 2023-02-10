@@ -1,24 +1,64 @@
 
+#include "board.hpp"
 #include <iostream>
-#include "udp-socket.hpp"
+int main(int argc, char* argv[]) {
 
-int main()
-{
-    UdpSocket socket1;
-    socket1.Connect("127.0.0.1", 22023);
+  // N = board size M = consecutivity H = human goes first? 1: 0
 
-    UdpSocket socket2;
-    socket2.Connect("127.0.0.1", 22023);
+  // std::cout << "Testing board class..." << std::endl;
+  int cols = 0;
+  int winLength = 0;
 
-    std::cout << socket1.SendString("3") << std::endl;
+  if (argc == 4) {
+    cols = std::stoi(argv[1]);
+    winLength = std::stoi(argv[2]);
+  }
 
-    std::string msg;
-    socket2.TryRecvString(msg);
+  Board board(cols, winLength);
+  printf("board size: %d, winLength: %d\n", cols, winLength);
 
-    std::cout << msg << std::endl;
+  // Game Loop
+  while (true) {
+    int move;
+    board.draw();
+    Players winner;
 
-    socket2.Disconnect();
-    socket1.Disconnect();
+    std::cout << "Player 1 please enter your move: ";
+    std::cin >> move;
+    std::cout << std::endl;
+    board.place(move, Players::Player1);
+    winner = board.checkForWin(move);
+    if (winner == Players::Player1) {
+      std::cout << "The winner is: "
+                << "Player 1" << std::endl;
+      break;
+    }
 
-    return 0;
+    if (board.full()) {
+      std::cout << "Game Over" << std::endl;
+      board.draw();
+      break;
+    }
+
+    board.draw();
+    std::cout << "Player 2 please enter your move: ";
+    std::cin >> move;
+    std::cout << std::endl;
+    board.place(move, Players::Player2);
+    winner = board.checkForWin(move);
+    // std::cout << (winner == Players::Player2) << std::endl;
+    if (winner == Players::Player1) {
+      std::cout << "The winner is: "
+                << "Player 2" << std::endl;
+      break;
+    }
+
+    if (board.full()) {
+      std::cout << "Game Over\n Winner: " << winner << std::endl;
+      board.draw();
+      break;
+    }
+  }
+
+  return 0;
 }

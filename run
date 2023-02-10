@@ -1,0 +1,3 @@
+make main
+
+./main 4 7 1
