@@ -1,27 +1,40 @@
 #include "udp-server.hpp"
 
-#include <arpa/inet.h>  // htons, inet_addr
-#include <sys/types.h>  // uint16_t
-#include <sys/socket.h> // socket, sendto
-#include <unistd.h>     // close
+bool UdpServer::start(unsigned short port) {
 
-bool UdpServer::start(unsigned short port)
-{
-    socket = socket(AF_INET, SOCK_DGRAM, 0);
+  struct sockaddr_in servaddr;
+  sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
-    destination.sin_family = AF_INET;
-    destination.sin_port = htons(port);
-    destination.sin_addr.s_addr = inet_addr(address.c_str());
+  memset(&servaddr, 0, sizeof(servaddr));
+
+  servaddr.sin_family = AF_INET;
+  servaddr.sin_addr.s_addr = INADDR_ANY;
+  servaddr.sin_port = htons(port);
+
+  bind(sockfd, (const struct sockaddr*) &servaddr, sizeof(servaddr));
+
+  return true;
 }
 
-void UdpServer::stop()
-{
+void UdpServer::stop() { close(sockfd); }
+
+bool UdpServer::send(char outgoing) {
+  socklen_t len = sizeof(clientAddr);
+  char buffer[1] = {outgoing};
+
+  sendto(sockfd, (const char*) buffer, strlen((const char*) buffer),
+         MSG_CONFIRM, (const struct sockaddr*) &clientAddr, len);
+
+  return true;
 }
 
-bool UdpServer::sendTo()
-{
-}
+char UdpServer::receive() {
+  char buffer[1];
 
-bool UdpServer::stop()
-{
+  socklen_t len = sizeof(clientAddr);
+
+  recvfrom(sockfd, (char*) buffer, 1, MSG_WAITALL,
+           (struct sockaddr*) &clientAddr, &len);
+
+  return buffer[0];
 }
