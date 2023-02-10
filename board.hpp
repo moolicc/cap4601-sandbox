@@ -18,7 +18,6 @@ private:
   short* columns;
 
   short getColumnValue(int col) const;
-
   std::string repeat(const std::string str, int num) const;
 
 public:
@@ -32,8 +31,8 @@ public:
 
   bool place(int col, Players player);
   Players checkForWin(int col) const;
-
   void draw() const;
+  bool full() const;
 };
 
 #endif

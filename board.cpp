@@ -39,6 +39,15 @@ Players Board::getMove(int col, int row) const {
 
 short Board::getColumnValue(int col) const { return columns[col]; }
 
+std::string Board::repeat(const std::string str, int num) const {
+  std::string ret = "";
+  for (int i = 0; i < num; i++) {
+    ret += str;
+  }
+  ret += '\n';
+  return ret;
+}
+
 bool Board::place(int col, Players player) {
   // Ensure the column is valid.
   if (col < 0 && col >= size) {
@@ -251,11 +260,15 @@ void Board::draw() const {
   std::cout << board << std::endl;
 }
 
-std::string Board::repeat(const std::string str, int num) const {
-  std::string ret = "";
-  for (int i = 0; i < num; i++) {
-    ret += str;
+bool Board::full() const {
+  int fullCols = 0;
+  for (int col = 0, colLength = 0; col < this->size; col++) {
+    colLength = columns[col] >> MOVE_BITS;
+    if (colLength == size)
+      fullCols++;
+
+    printf("col: %d, colLength: %d, fullCols: %d\n", col, colLength, fullCols);
   }
-  ret += '\n';
-  return ret;
+
+  return fullCols == this->size;
 }

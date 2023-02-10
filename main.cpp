@@ -17,60 +17,48 @@ int main(int argc, char* argv[]) {
   Board board(cols, winLength);
   printf("board size: %d, winLength: %d\n", cols, winLength);
 
-  // down and to the left win
-  board.place(3, Players::Player2);
-  board.place(3, Players::Player2);
-  board.place(3, Players::Player2);
-  board.place(3, Players::Player2);
-  board.place(3, Players::Player2);
+  // Game Loop
+  while (true) {
+    int move;
+    board.draw();
+    Players winner;
 
-  board.place(0, Players::Player1);
-  board.place(0, Players::Player1);
-  board.place(0, Players::Player1);
-  board.place(0, Players::Player1);
-  board.place(0, Players::Player1);
-  board.draw();
+    std::cout << "Player 1 please enter your move: ";
+    std::cin >> move;
+    std::cout << std::endl;
+    board.place(move, Players::Player1);
+    winner = board.checkForWin(move);
+    if (winner == Players::Player1) {
+      std::cout << "The winner is: "
+                << "Player 1" << std::endl;
+      break;
+    }
 
-  Players winner = board.checkForWin(0);
+    if (board.full()) {
+      std::cout << "Game Over" << std::endl;
+      board.draw();
+      break;
+    }
 
-  std::cout << "winner: ";
-  if (winner == Players::Player1) {
-    std::cout << "Player 1";
-  } else if (winner == Players::Player2) {
-    std::cout << "Player 2";
-  } else {
-    std::cout << "Nobody";
+    board.draw();
+    std::cout << "Player 2 please enter your move: ";
+    std::cin >> move;
+    std::cout << std::endl;
+    board.place(move, Players::Player2);
+    winner = board.checkForWin(move);
+    // std::cout << (winner == Players::Player2) << std::endl;
+    if (winner == Players::Player1) {
+      std::cout << "The winner is: "
+                << "Player 2" << std::endl;
+      break;
+    }
+
+    if (board.full()) {
+      std::cout << "Game Over\n Winner: " << winner << std::endl;
+      board.draw();
+      break;
+    }
   }
-  std::cout << std::endl;
-
-  // while (true) {
-  //   int move;
-  //   board.draw();
-
-  //   std::cout << "Player 1 please enter your move: ";
-  //   std::cin >> move;
-  //   std::cout << std::endl;
-  //   board.place(move, Players::Player1);
-
-  //   if (board.checkForWin(move) == Players::Player1) {
-  //     std::cout << "The winner is: "
-  //               << "Player 1" << std::endl;
-  //     break;
-  //   }
-
-  //   board.draw();
-  //   std::cout << "Player 2 please enter your move: ";
-  //   std::cin >> move;
-  //   std::cout << std::endl;
-  //   board.place(move, Players::Player2);
-
-  //   // std::cout << (winner == Players::Player2) << std::endl;
-  //   if (board.checkForWin(move) == Players::Player1) {
-  //     std::cout << "The winner is: "
-  //               << "Player 2" << std::endl;
-  //     break;
-  //   }
-  // }
 
   return 0;
 }
