@@ -3,7 +3,11 @@
 
 int Game::getHumanMove() {
   int move;
-  std::cout << "Please enter your move: ";
+  if (currentPlayer == Players::Player1) {
+    std::cout << "Player 1, please enter your move: ";
+  } else {
+    std::cout << "Player 2, please enter your move: ";
+  }
   std::cin >> move;
   std::cout << std::endl;
   return move;
@@ -34,6 +38,7 @@ void Game::start() {
   while (true) {
     board.draw();
     int move = getHumanMove();
+    currentPlayer = Player1;
     board.place(move, Players::Player1);
     winner = board.checkForWin(move);
     if (winner != Players::None) {
@@ -44,6 +49,7 @@ void Game::start() {
     }
     board.draw();
 
+    currentPlayer = Player2;
     move = getHumanMove();
     board.place(move, Players::Player2);
     winner = board.checkForWin(move);
