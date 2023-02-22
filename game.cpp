@@ -37,9 +37,17 @@ bool Game::checkForDraw() {
 void Game::start() {
   while (true) {
     board.draw();
-    int move = getHumanMove();
+    Status moveStatus;
+    int move;
     currentPlayer = Player1;
-    board.place(move, Players::Player1);
+    do {
+      move = getHumanMove();
+      moveStatus = board.place(move, Players::Player1);
+      if (moveStatus == Status::OutOfBounds) {
+        std::cout << "Please enter a column from 0 to " << boardSize - 1
+                  << std::endl;
+      }
+    } while (moveStatus != Status::Success);
     winner = board.checkForWin(move);
     if (winner != Players::None) {
       printWinner();
@@ -50,8 +58,14 @@ void Game::start() {
     board.draw();
 
     currentPlayer = Player2;
-    move = getHumanMove();
-    board.place(move, Players::Player2);
+    do {
+      move = getHumanMove();
+      moveStatus = board.place(move, Players::Player2);
+      if (moveStatus == Status::OutOfBounds) {
+        std::cout << "Please enter a column from 0 to " << boardSize - 1
+                  << std::endl;
+      }
+    } while (moveStatus != Status::Success);
     winner = board.checkForWin(move);
     if (winner != Players::None) {
       printWinner();

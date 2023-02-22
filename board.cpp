@@ -48,17 +48,17 @@ std::string Board::repeat(const std::string str, int num) const {
   return ret;
 }
 
-bool Board::place(int col, Players player) {
+Status Board::place(int col, Players player) {
   // Ensure the column is valid.
-  if (col < 0 && col >= size) {
-    return false;
+  if (col < 0 || col >= size) {
+    return Status::OutOfBounds;
   }
   short colValue = columns[col];
 
   // Ensure there is space on the column for another move.
   int colLength = colValue >> MOVE_BITS;
   if (colLength >= MAX_LENGTH) {
-    return false;
+    return Status::FullCol;
   }
 
   // Add our new move to the column.
@@ -82,7 +82,7 @@ bool Board::place(int col, Players player) {
   // Add our new move to the column.
   columns[col] = colValue;
 
-  return true;
+  return Status::Success;
 }
 
 Players Board::checkForWin(int refCol) const {
