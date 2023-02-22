@@ -21,14 +21,13 @@ private:
   std::string repeat(const std::string str, int num) const;
 
 public:
-  Players getMove(int col, int row) const;
-  Board(int size, int winLength);
-  // explicit Board() { Board(3); }
+  explicit Board() { Board(3, 4); }
+  explicit Board(int size, int winLength);
   // explicit Board(const Board &board);
   ~Board();
 
+  Players getMove(int col, int row) const;
   int getSize() const { return size; }
-
   bool place(int col, Players player);
   Players checkForWin(int col) const;
   void draw() const;
