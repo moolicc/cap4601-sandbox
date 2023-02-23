@@ -12,6 +12,8 @@ private:
   Players minimizer;
   int boardSize;
   int abSearch(Board state);
+  // int minValue(short* node, int depth, int alpha, int beta);
+  // int maxValue(short* node, int depth, int alpha, int beta);
   int minValue(short* node, Board problem, int depth, int alpha, int beta);
   int maxValue(short* node, Board problem, int depth, int alpha, int beta);
   int min(int a, int b) {

@@ -20,29 +20,36 @@ private:
   std::string repeat(const std::string str, int num) const;
 
   bool checkHorizontalWin(int refCol, int refRow, Players player,
-                          bool allowEmpty) const;
-  bool checkVerticalWin(int refCol, int refRow, Players player,
-                        bool allowEmpty) const;
+                          bool allowEmpty, int preCount) const;
+  bool checkVerticalWin(int refCol, int refRow, Players player, bool allowEmpty,
+                        int preCount) const;
   bool checkLeftRightDiagonalWin(int refCol, int refRow, Players player,
-                                 bool allowEmpty) const;
+                                 bool allowEmpty, int preCount) const;
   bool checkRightLeftDiagonalWin(int refCol, int refRow, Players player,
-                                 bool allowEmpty) const;
+                                 bool allowEmpty, int preCount) const;
+
+  int countHorizontalConnections(int refCol, int refRow, Players player,
+                                 int connections);
+  int countVerticalConnections(int refCol, int refRow, Players player,
+                               int connections);
 
 public:
   Board() { Board(3, 4); }
   Board(int size, int winLength);
+  // Board(short* node, int size, int winLength);
   Board(const Board& other);
-  // explicit Board(const Board &board);
+  Board& operator=(const Board& other);
   ~Board();
-  short* Board::getState() { return this->columns; }
+  short* getState() { return this->columns; }
   Players getMove(int col, int row) const;
   int getSize() const { return size; }
   Status place(int col, Players player);
   Players checkForWin(int col) const;
-  int getPossibleWins(Players player) const;
+  int getPossibleWins(Players player);
   void draw() const;
   bool full() const;
   void remove(int col);
+  int getWinLength() { return winLength; }
 };
 
 #endif

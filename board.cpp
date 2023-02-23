@@ -20,6 +20,15 @@ Board::Board(const Board& other) {
   }
 }
 
+Board& Board::operator=(const Board& other) {
+  size = other.size;
+  columns = new short[size];
+  for (int i = 0; i < size; i++) {
+    columns[i] = other.columns[i];
+  }
+  return *this;   // IMPORTANT! return the current object by reference
+}
+
 Board::~Board() { delete[] columns; }
 
 Players Board::getMove(int col, int row) const {
@@ -47,8 +56,62 @@ std::string Board::repeat(const std::string str, int num) const {
   return ret;
 }
 
+int Board::countHorizontalConnections(int refCol, int refRow, Players player,
+                                      int connections) {
+
+  int count = 0;
+
+  if (connections != 0) {
+    count = connections;
+  }
+
+  // base case 1: no more columns to check
+  std::cout << "segfault check in countHC" << std::endl;
+  if (refCol < 0 || refCol >= size) {
+    return count;
+  }
+
+  // base case 2: player in the current cell is not the same as previous
+  if (getMove(refCol, refRow) != player) {
+    return count;
+  }
+
+  count++;
+  countHorizontalConnections(++refCol, refRow, player, count);   // check right
+  countHorizontalConnections(--refCol, refRow, player, count);   // check left
+
+  return count;
+}
+
+int Board::countVerticalConnections(int refCol, int refRow, Players player,
+                                    int connections) {
+
+  std::cout << "segfault check in conutVC" << std::endl;
+  int count = 0;
+
+  if (connections != 0) {
+    count = connections;
+  }
+
+  // base case 1: no more columns to check
+  if (refRow < 0 || refRow >= size) {
+    return count;
+  }
+
+  // base case 2: player in the current cell is not the same as previous
+  if (getMove(refCol, refRow) != player) {
+    return count;
+  }
+
+  count++;
+  countVerticalConnections(refCol, ++refRow, player, count);
+  countVerticalConnections(refCol, --refRow, player, count);
+
+  return count;
+}
+
 bool Board::checkHorizontalWin(int refCol, int refRow, Players player,
-                               bool allowEmpty) const {
+                               bool allowEmpty, int preCount) const {
   int count = 0;
   // check horizontal right
   for (int col = refCol; col < refCol + winLength && col < size; col++) {
@@ -79,8 +142,8 @@ bool Board::checkHorizontalWin(int refCol, int refRow, Players player,
 }
 
 bool Board::checkVerticalWin(int refCol, int refRow, Players player,
-                             bool allowEmpty) const {
-  int count = 0;
+                             bool allowEmpty, int preCount) const {
+  int count = preCount;
   // check vertical down
   for (int row = refRow; row >= refRow - winLength && row >= 0; row--) {
     Players playerAt = getMove(refCol, row);
@@ -115,8 +178,8 @@ bool Board::checkVerticalWin(int refCol, int refRow, Players player,
 }
 
 bool Board::checkLeftRightDiagonalWin(int refCol, int refRow, Players player,
-                                      bool allowEmpty) const {
-  int count = 0;
+                                      bool allowEmpty, int preCount) const {
+  int count = preCount;
 
   // diagonal up to the left
   // row increases , col decreases
@@ -155,8 +218,8 @@ bool Board::checkLeftRightDiagonalWin(int refCol, int refRow, Players player,
 }
 
 bool Board::checkRightLeftDiagonalWin(int refCol, int refRow, Players player,
-                                      bool allowEmpty) const {
-  int count = 0;
+                                      bool allowEmpty, int preCount) const {
+  int count = preCount;
 
   // diagonal up to the right
   // row increases , col increases
@@ -208,9 +271,9 @@ Status Board::place(int col, Players player) {
   // bits would cause inaccurate lengths to be held.
 
   // For example, if the current length is 1 (0b0001...) and we add a new move
-  // then naturally the length should go to 2 (0b0010...). However, using the OR
-  // below WITHOUT a mask here to clear the old length would result in a length
-  // of 3 (0b0001 | 0b0010 = 0b0011).
+  // then naturally the length should go to 2 (0b0010...). However, using the
+  // OR below WITHOUT a mask here to clear the old length would result in a
+  // length of 3 (0b0001 | 0b0010 = 0b0011).
 
   // If a player was provided, set their move and increment the column length.
   // If a player was not provided, then consider this a REMOVE operation and
@@ -240,7 +303,7 @@ Status Board::place(int col, Players player) {
 }
 
 Players Board::checkForWin(int refCol) const {
-  int count = 0;
+  // int count = 0;
 
   // Get the most recently placed row.
   int refRow = (columns[refCol] >> MOVE_BITS) - 1;
@@ -251,19 +314,19 @@ Players Board::checkForWin(int refCol) const {
 
   Players player = getMove(refCol, refRow);
 
-  if (checkHorizontalWin(refCol, refRow, player, false)) {
+  if (checkHorizontalWin(refCol, refRow, player, false, 0)) {
     return player;
   }
 
-  if (checkVerticalWin(refCol, refRow, player, false)) {
+  if (checkVerticalWin(refCol, refRow, player, false, 0)) {
     return player;
   }
 
-  if (checkLeftRightDiagonalWin(refCol, refRow, player, false)) {
+  if (checkLeftRightDiagonalWin(refCol, refRow, player, false, 0)) {
     return player;
   }
 
-  if (checkRightLeftDiagonalWin(refCol, refRow, player, false)) {
+  if (checkRightLeftDiagonalWin(refCol, refRow, player, false, 0)) {
     return player;
   }
 
@@ -272,7 +335,7 @@ Players Board::checkForWin(int refCol) const {
 
 // how many connected moves do we have in a particular direction, and how many
 // more do we need for a win in that direction?
-int Board::getPossibleWins(Players player) const {
+int Board::getPossibleWins(Players player) {
   int winCount = 0;
 
   for (int i = 0; i < size; i++) {
@@ -283,17 +346,22 @@ int Board::getPossibleWins(Players player) const {
     }
 
     Players player = getMove(i, refRow);
+    // get the number of already connected pieces
+    int preCount = 0;
+    // vertical down
+    // preCount += countHorizontalConnections(i, refRow, player, 0);
+    // preCount += countVerticalConnections(i, refRow, player, 0);
 
-    if (checkHorizontalWin(i, refRow, player, true)) {
+    if (checkHorizontalWin(i, refRow, player, true, preCount)) {
       winCount++;
     }
-    if (checkVerticalWin(i, refRow, player, true)) {
+    if (checkVerticalWin(i, refRow, player, true, preCount)) {
       winCount++;
     }
-    if (checkLeftRightDiagonalWin(i, refRow, player, true)) {
+    if (checkLeftRightDiagonalWin(i, refRow, player, true, preCount)) {
       winCount++;
     }
-    if (checkRightLeftDiagonalWin(i, refRow, player, true)) {
+    if (checkRightLeftDiagonalWin(i, refRow, player, true, preCount)) {
       winCount++;
     }
   }
@@ -302,8 +370,8 @@ int Board::getPossibleWins(Players player) const {
 }
 
 /**
- * @brief A simple function to draw a board of the following layout based on the
-size of the playingField.
+ * @brief A simple function to draw a board of the following layout based on
+the size of the playingField.
  *        This example assumes a board size of 4X4
  *
 +---+---+---+---+---+

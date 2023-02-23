@@ -26,11 +26,17 @@ int Game::getHumanMove() {
   return move;
 }
 
-int Game::abSearch(Board problem) {
-  int alpha = -INT32_MAX, alphaPrime = 0, beta = INT32_MAX, a = NULL,
-      depthLimit = 5;
+int Game::getAgentMove() {
+  int move = abSearch(board);
+  std::cout << move << std::endl;
+  return move;
+}
 
-  short* node = problem.getState();
+int Game::abSearch(Board board) {
+  int alpha = -INT32_MAX, alphaPrime = 0, beta = INT32_MAX, a = NULL;
+  int depthLimit = 5;
+  short* node = board.getState();
+  Board problem = board;
 
   // loop through all possible moves from
   for (int action = 0; action < boardSize; ++action) {
@@ -42,15 +48,16 @@ int Game::abSearch(Board problem) {
     // does apply action make a move on a copy of the current board state and
     // then apply the given action to it? How does it keep track of the current
     // player?
-    alphaPrime =
-        minValue(problem.getState(), problem, depthLimit--, alpha, beta);
+    problem.place(action, maximizer);
+    // std::cout << "alpha prime minValue call: " << action << std::endl;
+    alphaPrime = minValue(node, problem, --depthLimit, alpha, beta);
 
     if (alphaPrime > alpha) {
       alpha = alphaPrime;
       a = action;
     }
 
-    board.remove(action);
+    problem.remove(action);
   }
 
   return a;
@@ -60,27 +67,37 @@ int Game::minValue(short* node, Board problem, int depth, int alpha, int beta) {
   if (depth == 0) {
     return utility(problem);
   }
-
-  for (int action = 0; action < boardSize; ++action) {
+  depth--;
+  for (int action = 0; action < boardSize; action++) {
+    // std::cout << "maxValue call: " << action << std::endl;
 
     // NOTES FOR DR.R
     // what is the difference between making a move on the board and
     // applyState(node, action)
-    board.place(action, minimizer);
-    beta = min(beta, maxValue(problem.getState(), Board(problem), depth--,
-                              alpha, beta));
+    // is it correct that the minValue function is evaluating the best move for
+    // the minimizing player?
+    problem.place(action, minimizer);
+    beta = min(beta, maxValue(problem.getState(), problem, depth, alpha, beta));
+    problem.remove(action);
+    if (alpha >= beta)
+      return -INT32_MAX;
   }
+  return alpha;
 }
 
 int Game::maxValue(short* node, Board problem, int depth, int alpha, int beta) {
   if (depth == 0) {
     return utility(problem);
   }
-
-  for (int action = 0; action < boardSize; ++action) {
-    board.place(action, maximizer);
-    alpha = max(alpha, minValue(problem.getState(), Board(problem), depth--,
-                                alpha, beta));
+  depth--;
+  for (int action = 0; action < boardSize; action++) {
+    // is it correct that the maxValue function is evaluating the best move for
+    // the maximizing player?
+    problem.place(action, maximizer);
+    // std::cout << "minValue call: " << action << std::endl;
+    alpha =
+        max(alpha, minValue(problem.getState(), problem, depth, alpha, beta));
+    problem.remove(action);
     if (alpha >= beta)
       return INT32_MAX;
   }
@@ -102,9 +119,16 @@ void Game::printWinner() {
 // what gets passed in here? the leaf node of the search tree after all
 // recursion?
 int Game::utility(Board problem) {
-  int maximizerUtil = board.getPossibleWins(maximizer);
-  int minimizerUtil = board.getPossibleWins(minimizer);
+  problem.draw();
+  int maximizerUtil = problem.getPossibleWins(maximizer);
+  int minimizerUtil = problem.getPossibleWins(minimizer);
 
+  std::cout << "utility of this state for maximizer:" << maximizerUtil
+            << std::endl;
+  std::cout << "utility of this state for minimizer:" << minimizerUtil
+            << std::endl;
+  std::cout << "total utility of this state for maximizer:"
+            << maximizerUtil - minimizerUtil << std::endl;
   return maximizerUtil - minimizerUtil;
 }
 
@@ -142,7 +166,7 @@ void Game::start() {
 
     currentPlayer = Player2;
     do {
-      move = getHumanMove();
+      move = getAgentMove();
       moveStatus = board.place(move, Players::Player2);
       if (moveStatus == Status::OutOfBounds) {
         std::cout << "Please enter a column from 0 to " << boardSize - 1
