@@ -1,18 +1,45 @@
 
 #include "board.hpp"
+#include "udp-client.hpp"
+#include "udp-server.hpp"
 #include <iostream>
+
 int main(int argc, char* argv[]) {
-
-  // N = board size M = consecutivity H = human goes first? 1: 0
-
-  // std::cout << "Testing board class..." << std::endl;
   int cols = 0;
   int winLength = 0;
 
   if (argc == 4) {
     cols = std::stoi(argv[1]);
     winLength = std::stoi(argv[2]);
+  } else if (argc > 4) {
+    cols = std::stoi(argv[1]);
+    winLength = std::stoi(argv[2]);
+    UdpClient client;
+    UdpServer server;
+
+    std::string ipAddress = argv[4];
+    unsigned short port = std::stoi(argv[5]);
+
+    server.start(port);
+    client.start(port, ipAddress);
+
+    client.sendToServer();
+    char incomingFromClient = server.receive();
+
+    std::cout << "incoming from client: " << incomingFromClient << std::endl;
+
+    server.send('a');
+    char incomingFromServer = client.recieve();
+
+    std::cout << "incoming from server: " << incomingFromServer << std::endl;
+
+    client.stop();
+    server.stop();
   }
+
+  // N = board size M = consecutivity H = human goes first? 1: 0
+
+  // std::cout << "Testing board class..." << std::endl;
 
   Board board(cols, winLength);
   printf("board size: %d, winLength: %d\n", cols, winLength);
