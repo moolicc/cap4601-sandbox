@@ -85,7 +85,8 @@
         "string_view": "cpp",
         "unordered_map": "cpp",
         "variant": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "filesystem": "cpp"
     },
     "editor.formatOnSave": true
 }

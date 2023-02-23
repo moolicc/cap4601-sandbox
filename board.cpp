@@ -10,16 +10,15 @@ Board::Board(int size, int winLength) : size(size), winLength(winLength) {
   }
 }
 
-// Board::Board(const Board &other)
-// {
-//   this->size = other.size;
-//   this->columns = new  int[size];
+Board::Board(const Board& other) {
+  size = other.size;
+  winLength = other.winLength;
 
-//   for (int i = 0; i < size; i++)
-//   {
-//     columns[i] = other.getColumnValue(i);
-//   }
-// }
+  this->columns = new short[size];
+  for (int i = 0; i < size; i++) {
+    columns[i] = other.columns[i];
+  }
+}
 
 Board::~Board() { delete[] columns; }
 
@@ -48,18 +47,159 @@ std::string Board::repeat(const std::string str, int num) const {
   return ret;
 }
 
+bool Board::checkHorizontalWin(int refCol, int refRow, Players player,
+                               bool allowEmpty) const {
+  int count = 0;
+  // check horizontal right
+  for (int col = refCol; col < refCol + winLength && col < size; col++) {
+    if (getMove(col, refRow) == player) {
+      count++;
+    } else {
+      break;
+    }
+    if (count == winLength) {
+      return true;
+    }
+  }
+  count = 0;
+
+  // check horizontal left
+  for (int col = refCol; col >= refCol - winLength && col >= 0; col--) {
+    Players playerAt = getMove(col, refRow);
+    if (playerAt == player || (allowEmpty && playerAt == Players::None)) {
+      count++;
+    } else {
+      break;
+    }
+    if (count == winLength) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Board::checkVerticalWin(int refCol, int refRow, Players player,
+                             bool allowEmpty) const {
+  int count = 0;
+  // check vertical down
+  for (int row = refRow; row >= refRow - winLength && row >= 0; row--) {
+    Players playerAt = getMove(refCol, row);
+    if (playerAt == player || (allowEmpty && playerAt == Players::None)) {
+      count++;
+    } else {
+      break;
+    }
+    if (count == winLength) {
+      return true;
+    }
+  }
+  count = 0;
+
+  if (allowEmpty) {
+    // check vertical up
+    for (int row = refRow; row <= refRow + winLength && row < size; row++) {
+      Players playerAt = getMove(refCol, row);
+      if (playerAt == Players::None) {
+        count++;
+      } else {
+        break;
+      }
+      if (count == winLength) {
+        return true;
+      }
+    }
+    count = 0;
+  }
+
+  return false;
+}
+
+bool Board::checkLeftRightDiagonalWin(int refCol, int refRow, Players player,
+                                      bool allowEmpty) const {
+  int count = 0;
+
+  // diagonal up to the left
+  // row increases , col decreases
+  for (int col = refCol, row = refRow;
+       col > refCol - winLength && row <= refRow + winLength; col--, row++) {
+    Players playerAt = getMove(col, row);
+    if (playerAt == player || (allowEmpty && playerAt == Players::None)) {
+      count++;
+    } else {
+      break;
+    }
+    if (count == winLength) {
+      return true;
+    }
+  }
+  count = 0;
+
+  // diagonal down to the right
+  // row ++ , col++
+  for (int col = refCol, row = refRow;
+       col <= refCol + winLength && row > refRow - winLength && col < size &&
+       row >= 0;
+       col++, row--) {
+    Players playerAt = getMove(col, row);
+    if (playerAt == player || (allowEmpty && playerAt == Players::None)) {
+      count++;
+    } else {
+      break;
+    }
+    if (count == winLength) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool Board::checkRightLeftDiagonalWin(int refCol, int refRow, Players player,
+                                      bool allowEmpty) const {
+  int count = 0;
+
+  // diagonal up to the right
+  // row increases , col increases
+  for (int col = refCol, row = refRow;
+       col <= refCol + winLength && row <= refRow + winLength; col++, row++) {
+    Players playerAt = getMove(col, row);
+    if (playerAt == player || (allowEmpty && playerAt == Players::None)) {
+      count++;
+    } else {
+      break;
+    }
+    if (count == winLength) {
+      return true;
+    }
+  }
+  count = 0;
+
+  // diagonal down to the left
+  // row decreases , col decreases
+  for (int col = refCol, row = refRow;
+       col > refCol - winLength && row > refRow - winLength && col >= 0 &&
+       row >= 0;
+       col--, row--) {
+    Players playerAt = getMove(col, row);
+    if (playerAt == player || (allowEmpty && playerAt == Players::None)) {
+      count++;
+    } else {
+      break;
+    }
+    if (count == winLength) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 Status Board::place(int col, Players player) {
   // Ensure the column is valid.
   if (col < 0 || col >= size) {
     return Status::OutOfBounds;
   }
   short colValue = columns[col];
-
-  // Ensure there is space on the column for another move.
-  int colLength = colValue >> MOVE_BITS;
-  if (colLength >= MAX_LENGTH) {
-    return Status::FullCol;
-  }
 
   // Add our new move to the column.
   // Using the MOVE_MASK will remove the column length data.
@@ -72,10 +212,24 @@ Status Board::place(int col, Players player) {
   // below WITHOUT a mask here to clear the old length would result in a length
   // of 3 (0b0001 | 0b0010 = 0b0011).
 
-  colValue = MOVE_MASK & (colValue | (player << colLength));
+  // If a player was provided, set their move and increment the column length.
+  // If a player was not provided, then consider this a REMOVE operation and
+  // decrement the length.
+  int colLength = colValue >> MOVE_BITS;
+  if (player != Players::None) {
+    // Ensure there is space on the column for another move.
+    if (colLength >= MAX_LENGTH) {
+      return Status::FullCol;
+    }
 
-  // Update the column's length.
-  colLength++;
+    // Set the move.
+    colValue = MOVE_MASK & (colValue | (player << colLength));
+
+    // Update the column's length.
+    colLength++;
+  } else {
+    colLength--;
+  }
 
   colValue |= colLength << MOVE_BITS;
 
@@ -97,110 +251,54 @@ Players Board::checkForWin(int refCol) const {
 
   Players player = getMove(refCol, refRow);
 
-  // check horizontal right
-  for (int col = refCol; col < refCol + winLength && col < size; col++) {
-    if (getMove(col, refRow) == player) {
-      count++;
-    } else {
-      break;
-    }
-    if (count == winLength) {
-      return player;
-    }
+  if (checkHorizontalWin(refCol, refRow, player, false)) {
+    return player;
   }
-  count = 0;
 
-  // check horizontal left
-  for (int col = refCol; col >= refCol - winLength && col >= 0; col--) {
-    if (getMove(col, refRow) == player) {
-      count++;
-    } else {
-      break;
-    }
-    if (count == winLength) {
-      return player;
-    }
+  if (checkVerticalWin(refCol, refRow, player, false)) {
+    return player;
   }
-  count = 0;
 
-  // check vertical down
-  for (int row = refRow; row >= refRow - winLength && row >= 0; row--) {
-    if (getMove(refCol, row) == player) {
-      count++;
-    } else {
-      break;
-    }
-    if (count == winLength) {
-      return player;
-    }
+  if (checkLeftRightDiagonalWin(refCol, refRow, player, false)) {
+    return player;
   }
-  count = 0;
 
-  // diagonal down to the left
-  // row decreases , col decreases
-  for (int col = refCol, row = refRow;
-       col > refCol - winLength && row > refRow - winLength && col >= 0 &&
-       row >= 0;
-       col--, row--) {
-    if (getMove(col, row) == player) {
-      count++;
-    } else {
-      break;
-    }
-    if (count == winLength) {
-      return player;
-    }
+  if (checkRightLeftDiagonalWin(refCol, refRow, player, false)) {
+    return player;
   }
-  count = 0;
-
-  // diagonal down to the right
-  // row ++ , col++
-  for (int col = refCol, row = refRow;
-       col <= refCol + winLength && row > refRow - winLength && col < size &&
-       row >= 0;
-       col++, row--) {
-    if (getMove(col, row) == player) {
-      count++;
-    } else {
-      break;
-    }
-    if (count == winLength) {
-      return player;
-    }
-  }
-  count = 0;
-
-  // diagonal up to the left
-  // row increases , col decreases
-  for (int col = refCol, row = refRow;
-       col > refCol - winLength && row <= refRow + winLength; col--, row++) {
-    if (getMove(col, row) == player) {
-      count++;
-    } else {
-      break;
-    }
-    if (count == winLength) {
-      return player;
-    }
-  }
-  count = 0;
-
-  // diagonal up to the right
-  // row increases , col increases
-  for (int col = refCol, row = refRow;
-       col <= refCol + winLength && row <= refRow + winLength; col++, row++) {
-    if (getMove(col, row) == player) {
-      count++;
-    } else {
-      break;
-    }
-    if (count == winLength) {
-      return player;
-    }
-  }
-  count = 0;
 
   return Players::None;
+}
+
+// how many connected moves do we have in a particular direction, and how many
+// more do we need for a win in that direction?
+int Board::getPossibleWins(Players player) const {
+  int winCount = 0;
+
+  for (int i = 0; i < size; i++) {
+    int refRow = (columns[i] >> MOVE_BITS) - 1;
+
+    if (refRow < 0 || refRow > size) {
+      return 0;
+    }
+
+    Players player = getMove(i, refRow);
+
+    if (checkHorizontalWin(i, refRow, player, true)) {
+      winCount++;
+    }
+    if (checkVerticalWin(i, refRow, player, true)) {
+      winCount++;
+    }
+    if (checkLeftRightDiagonalWin(i, refRow, player, true)) {
+      winCount++;
+    }
+    if (checkRightLeftDiagonalWin(i, refRow, player, true)) {
+      winCount++;
+    }
+  }
+
+  return winCount;
 }
 
 /**
@@ -272,3 +370,5 @@ bool Board::full() const {
 
   return fullCols == this->size;
 }
+
+void Board::remove(int col) { place(col, Players::None); }

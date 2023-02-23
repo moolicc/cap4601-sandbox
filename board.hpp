@@ -16,21 +16,33 @@ private:
   int size;
   int winLength;
   short* columns;
-
   short getColumnValue(int col) const;
   std::string repeat(const std::string str, int num) const;
 
+  bool checkHorizontalWin(int refCol, int refRow, Players player,
+                          bool allowEmpty) const;
+  bool checkVerticalWin(int refCol, int refRow, Players player,
+                        bool allowEmpty) const;
+  bool checkLeftRightDiagonalWin(int refCol, int refRow, Players player,
+                                 bool allowEmpty) const;
+  bool checkRightLeftDiagonalWin(int refCol, int refRow, Players player,
+                                 bool allowEmpty) const;
+
 public:
-  explicit Board() { Board(3, 4); }
-  explicit Board(int size, int winLength);
+  Board() { Board(3, 4); }
+  Board(int size, int winLength);
+  Board(const Board& other);
   // explicit Board(const Board &board);
   ~Board();
+  short* Board::getState() { return this->columns; }
   Players getMove(int col, int row) const;
   int getSize() const { return size; }
   Status place(int col, Players player);
   Players checkForWin(int col) const;
+  int getPossibleWins(Players player) const;
   void draw() const;
   bool full() const;
+  void remove(int col);
 };
 
 #endif
